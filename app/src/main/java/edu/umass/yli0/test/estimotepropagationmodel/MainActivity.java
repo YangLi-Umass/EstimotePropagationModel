@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         writeDataToExternal.open();
         //// TODO: 11/13/2015
         writeDataToExternal.write("");
+
     }
 
     public void onClickStartButton(View v) {
