@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         writeDataToExternal = new WriteDataToExternal("Propagation", editTextDistance.getText().toString() + ".csv", file);
         writeDataToExternal.open();
         //// TODO: 11/13/2015
+
         writeDataToExternal.write("");
 
     }
