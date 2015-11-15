@@ -1,6 +1,9 @@
 package edu.umass.yli0.test.estimotepropagationmodel;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
@@ -13,9 +16,15 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.estimote.sdk.BeaconManager;
+import com.estimote.sdk.Region;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Set;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
     EditText editTextMinorGroup;
     EditText editTextCollectionTimes;
 
-    WriteDataToExternal writeDataToExternal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,13 +49,10 @@ public class MainActivity extends AppCompatActivity {
         editTextMinorGroup = (EditText)findViewById(R.id.beacons_minor);
         editTextCollectionTimes = (EditText)findViewById(R.id.collection_times);
 
-        File file = Environment.getExternalStorageDirectory();
-        writeDataToExternal = new WriteDataToExternal("Propagation", editTextDistance.getText().toString() + ".csv", file);
-        writeDataToExternal.open();
-        //// TODO: 11/13/2015
-
-        writeDataToExternal.write("");
-
+        IntentFilter positionReceiverFilter;
+        positionReceiverFilter = new IntentFilter(CollectionService.BROADCAST_FINISH_SIGNAL);
+        PositionReceiver positionReceiver = new PositionReceiver();
+        registerReceiver(positionReceiver, positionReceiverFilter);
     }
 
     public void onClickStartButton(View v) {
@@ -74,6 +79,14 @@ public class MainActivity extends AppCompatActivity {
     public void onClickStopButton(View v) {
         // Perform action on click
         stopService(intentService);
+    }
+
+    public class PositionReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            editTextDistance.setText("Finish Collection.");
+        }
     }
 
 }

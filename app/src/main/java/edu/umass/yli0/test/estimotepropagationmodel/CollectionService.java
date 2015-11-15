@@ -26,6 +26,9 @@ public class CollectionService extends Service {
     public CollectionService() {
     }
 
+    public static final String BROADCAST_FINISH_SIGNAL = "BROADCAST_FINISH_SIGNAL";
+
+
     Set <Integer> beaconMinorsSet;
     int collectionTimes;
     String distance;
@@ -36,6 +39,7 @@ public class CollectionService extends Service {
     private BeaconManager beaconManager;
 
     StringBuilder text = new StringBuilder();
+    WriteDataToExternal writeDataToExternal;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -48,6 +52,9 @@ public class CollectionService extends Service {
         collectionTimes = Integer.parseInt(bundle.getString(MainActivity.INTENT_SERVICE_COLLECTION_TIMES));
 
         beaconMinorsSet = convertStringToSetForBeaconMinors(beaconMinor);
+        File file = Environment.getExternalStorageDirectory();
+        writeDataToExternal = new WriteDataToExternal("PropagationModel", distance + "-" + dateFormat.format(new Date()) + ".csv", file);
+        writeDataToExternal.open();
 
         beaconManager.setRangingListener(new BeaconManager.RangingListener() {
             @Override
@@ -64,7 +71,9 @@ public class CollectionService extends Service {
                         }
                     }
                 }else if(collectionTimes == 0){
-                    addDataToFile("PropagationModel-" + dateFormat.format(new Date()), ""+ distance ,text.toString());
+                    writeDataToExternal.write(text.toString());
+                    Intent intent = new Intent(BROADCAST_FINISH_SIGNAL);
+                    sendBroadcast(intent);
                     stopSelf();
                 }
             }
@@ -102,26 +111,4 @@ public class CollectionService extends Service {
         beaconManager.stopRanging(ALL_ESTIMOTE_BEACONS);
     }
 
-    private void addDataToFile(String folderName, String filename,
-                               String content) {
-        File newFolder = new File(Environment.getExternalStorageDirectory(),
-                folderName);
-        if (!newFolder.exists()) {
-            newFolder.mkdir();
-        }
-        File newFile = new File(newFolder, filename);
-        try {
-            if (!newFile.exists()) {
-                newFile.createNewFile();
-            }
-            OutputStream fWriter = new FileOutputStream(newFile, true);
-            fWriter.write(content.getBytes());
-            fWriter.flush();
-            fWriter.close();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-    }
 }
