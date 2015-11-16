@@ -51,9 +51,11 @@ public class CollectionService extends Service {
         final String beaconMinor = bundle.getString(MainActivity.INTENT_SERVICE_MINOR_GROUP);
         collectionTimes = Integer.parseInt(bundle.getString(MainActivity.INTENT_SERVICE_COLLECTION_TIMES));
 
+        text.append(dateFormat.format(new Date()) + "\n" + "Minor ID, RSSI, Distance" + "\n");
+
         beaconMinorsSet = convertStringToSetForBeaconMinors(beaconMinor);
         File file = Environment.getExternalStorageDirectory();
-        writeDataToExternal = new WriteDataToExternal("PropagationModel", distance + "-" + dateFormat.format(new Date()) + ".csv", file);
+        writeDataToExternal = new WriteDataToExternal("PropagationModel", distance + ".csv", file);
         writeDataToExternal.open();
 
         beaconManager.setRangingListener(new BeaconManager.RangingListener() {
@@ -72,6 +74,7 @@ public class CollectionService extends Service {
                     }
                 }else if(collectionTimes == 0){
                     writeDataToExternal.write(text.toString());
+                    writeDataToExternal.close();
                     Intent intent = new Intent(BROADCAST_FINISH_SIGNAL);
                     sendBroadcast(intent);
                     stopSelf();

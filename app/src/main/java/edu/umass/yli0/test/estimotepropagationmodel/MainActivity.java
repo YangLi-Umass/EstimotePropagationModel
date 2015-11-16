@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
     EditText editTextMinorGroup;
     EditText editTextCollectionTimes;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         positionReceiverFilter = new IntentFilter(CollectionService.BROADCAST_FINISH_SIGNAL);
         PositionReceiver positionReceiver = new PositionReceiver();
         registerReceiver(positionReceiver, positionReceiverFilter);
+
     }
 
     public void onClickStartButton(View v) {
